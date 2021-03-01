@@ -1,0 +1,38 @@
+version: '3.5'
+services:
+  web:
+    container_name: odoo_container
+    image: odoo:13.0
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    volumes:
+      - odoo-web-data:/var/lib/odoo
+      - ./config:/etc/odoo
+      - ./addons:/mnt/extra-addons  
+  db:
+    container_name: db_container
+    image: postgres:10.9
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data/pgdata
+
+  tool:
+    container_name: tool_container
+    image: dpage/pgadmin4
+    depends_on: 
+      - db
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@mail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+
+volumes:
+  odoo-web-data:
+  odoo-db-data:
